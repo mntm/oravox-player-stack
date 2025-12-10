@@ -52,11 +52,13 @@ services:
   webserver:
     image: nginx:alpine
     restart: always
+    command: sh -c "sed 's|__base__|$PLAYER_BASE_LOCATION|' /tmp/default.conf > /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"
     ports:
       - "38080:80"
     depends_on:
       - phpfpm
       - cloner
+    env_file: .env
     environment:
       PLAYER_BASE_LOCATION: $PLAYER_BASE_LOCATION
     networks:
@@ -65,7 +67,7 @@ services:
       - web:/var/www/html
       - web_db:/var/www/html/db
       - web_stories:/var/www/html/assets/stories
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/default.conf:/tmp/default.conf:ro
 volumes:
   web:
   web_stories:
