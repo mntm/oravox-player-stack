@@ -1,0 +1,74 @@
+name: oravox-player
+
+services:
+  cloner:
+    image: alpine/git:latest
+    env_file: .env
+    environment:
+      REPO_URL: $REPO_URL
+      WWW_DIR: $WWW_DIR
+      GIT_BRANCH: $GIT_BRANCH
+    entrypoint: ["/init.sh"]
+    networks:
+      - oravox_player_network
+    volumes:
+      - web:/var/www/html
+      - ./docker/cloner/init.sh:/init.sh:ro
+
+  copier:
+    image: alpine:latest
+    entrypoint: ["/init.sh"]
+    env_file: .env
+    networks:
+      - oravox_player_network
+    volumes:
+      - ${SRC_DB_DIR}:/db
+      - ${SRC_STORIES_DIR}:/stories
+      - web_db:/var/www/html/db
+      - web_stories:/var/www/html/assets/stories
+      - ./docker/copier/init.sh:/init.sh:ro
+
+  phpfpm:
+    image: bitnami/php-fpm:latest
+    env_file: .env
+    depends_on:
+      cloner:
+        condition: service_completed_successfully
+      copier:
+        condition: service_completed_successfully
+    environment:
+      PHP_POST_MAX_SIZE: $PHP_POST_MAX_SIZE
+      PHP_UPLOAD_MAX_FILESIZE: $PHP_UPLOAD_MAX_FILESIZE
+      PHP_MAX_EXECUTION_TIME: $PHP_MAX_EXECUTION_TIME
+      PLAYER_BASE_LOCATION: $PLAYER_BASE_LOCATION
+    networks:
+      - oravox_player_network
+    volumes:
+      - web:/var/www/html
+      - web_db:/var/www/html/db
+      - web_stories:/var/www/html/assets/stories
+
+  webserver:
+    image: nginx:alpine
+    ports:
+      - "38080:80"
+    depends_on:
+      - phpfpm
+      - cloner
+    environment:
+      PLAYER_BASE_LOCATION: $PLAYER_BASE_LOCATION
+    networks:
+      - oravox_player_network
+    volumes:
+      - web:/var/www/html
+      - web_db:/var/www/html/db
+      - web_stories:/var/www/html/assets/stories
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+volumes:
+  web:
+  web_stories:
+  web_db:
+
+networks:
+  oravox_player_network:
+    driver: bridge
