@@ -31,6 +31,7 @@ services:
   phpfpm:
     image: bitnami/php-fpm:latest
     env_file: .env
+    restart: always
     depends_on:
       cloner:
         condition: service_completed_successfully
@@ -50,6 +51,7 @@ services:
 
   webserver:
     image: nginx:alpine
+    restart: always
     ports:
       - "38080:80"
     depends_on:
