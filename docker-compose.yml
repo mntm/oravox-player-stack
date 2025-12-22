@@ -2,7 +2,7 @@ name: oravox-player
 
 services:
   cloner:
-    image: alpine/git:latest
+    image: docker.io/alpine/git:latest
     env_file: .env
     environment:
       REPO_URL: $REPO_URL
@@ -16,7 +16,7 @@ services:
       - ./docker/cloner/init.sh:/init.sh:ro
 
   copier:
-    image: alpine:latest
+    image: docker.io/alpine:latest
     entrypoint: ["/init.sh"]
     env_file: .env
     networks:
@@ -29,7 +29,7 @@ services:
       - ./docker/copier/init.sh:/init.sh:ro
 
   phpfpm:
-    image: bitnami/php-fpm:latest
+    image: docker.io/bitnami/php-fpm:latest
     env_file: .env
     restart: always
     depends_on:
@@ -50,7 +50,7 @@ services:
       - web_stories:/var/www/html/assets/stories
 
   webserver:
-    image: nginx:alpine
+    image: docker.io/nginx:alpine
     restart: always
     command: sh -c "sed 's|__base__|$PLAYER_BASE_LOCATION|' /tmp/default.conf > /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"
     ports:
