@@ -42,6 +42,7 @@ services:
       PHP_UPLOAD_MAX_FILESIZE: $PHP_UPLOAD_MAX_FILESIZE
       PHP_MAX_EXECUTION_TIME: $PHP_MAX_EXECUTION_TIME
       PLAYER_BASE_LOCATION: $PLAYER_BASE_LOCATION
+      OPENAI_API_KEY: $OPENAI_API_KEY
     networks:
       - oravox_player_network
     volumes:
@@ -52,7 +53,7 @@ services:
   webserver:
     image: docker.io/nginx:alpine
     restart: always
-    command: sh -c "sed 's|__base__|$PLAYER_BASE_LOCATION|' /tmp/default.conf > /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"
+    command: sh -c "sed 's|__base__|$PLAYER_BASE_LOCATION|;s|__openai__|$OPENAI_API_KEY|' /tmp/default.conf > /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"
     ports:
       - "38080:80"
     depends_on:
@@ -60,7 +61,8 @@ services:
       - cloner
     env_file: .env
     environment:
-      PLAYER_BASE_LOCATION: $PLAYER_BASE_LOCATION
+     OPENAI_API_KEY: $OPENAI_API_KEY
+     PLAYER_BASE_LOCATION: $PLAYER_BASE_LOCATION
     networks:
       - oravox_player_network
     volumes:
