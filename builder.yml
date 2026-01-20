@@ -7,7 +7,7 @@ include:
 services:
   builder:
     image: docker.io/composer:2.9
-    command: "composer install && composer dump-autoload"
+    command: /bin/sh -c "composer install && composer dump-autoload"
     networks:
       - oravox_player_network
     depends_on:
@@ -17,7 +17,6 @@ services:
     volumes:
       - web:/var/www/html
       - composer_cache:/tmp
-      - ./docker/builder/init.sh:/init.sh:ro
 
 volumes:
   composer_cache:
