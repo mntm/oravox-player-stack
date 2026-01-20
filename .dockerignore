@@ -1,4 +1,5 @@
 .env
+.env-app
 .git
 .dockerignore
-docker-compose.yml
+*.yml
