@@ -34,7 +34,7 @@ services:
     image: docker.io/nginx:alpine
     restart: always
     ports:
-      - "38080:80"
+      - "${HOST_PORT:-38080}:80"
     depends_on:
       phpfpm:
         condition: service_started
