@@ -1,0 +1,18 @@
+# This service provides the source code for the
+# rest of the services. It should always be run
+# executed first.
+
+services:
+  cloner:
+    image: docker.io/alpine/git:latest
+    env_file: .env
+    environment:
+      REPO_URL: $REPO_URL
+      WWW_DIR: $WWW_DIR
+      GIT_BRANCH: $GIT_BRANCH
+    entrypoint: ["/init.sh"]
+    networks:
+      - oravox_player_network
+    volumes:
+      - web:/var/www/html
+      - ./docker/cloner/init.sh:/init.sh:ro

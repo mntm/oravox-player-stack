@@ -1,0 +1,23 @@
+# This service is responsible for the build stage.
+# For this project, that involves downloading dependencies.
+
+include:
+  - ./cloner.yml
+
+services:
+  builder:
+    image: docker.io/composer:2.9
+    command: "composer install && composer dump-autoload"
+    networks:
+      - oravox_player_network
+    depends_on:
+      cloner:
+        condition: service_completed_successfully
+    working_dir: /var/www/html
+    volumes:
+      - web:/var/www/html
+      - composer_cache:/tmp
+      - ./docker/builder/init.sh:/init.sh:ro
+
+volumes:
+  composer_cache:

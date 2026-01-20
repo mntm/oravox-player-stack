@@ -1,39 +1,19 @@
 name: oravox-player
 
+include:
+  - ./networks.yml
+  - ./volumes.yml
+  - ./cloner.yml
+  - ./builder.yml
+  - ./copier.yml
+
 services:
-  cloner:
-    image: docker.io/alpine/git:latest
-    env_file: .env
-    environment:
-      REPO_URL: $REPO_URL
-      WWW_DIR: $WWW_DIR
-      GIT_BRANCH: $GIT_BRANCH
-    entrypoint: ["/init.sh"]
-    networks:
-      - oravox_player_network
-    volumes:
-      - web:/var/www/html
-      - ./docker/cloner/init.sh:/init.sh:ro
-
-  copier:
-    image: docker.io/alpine:latest
-    entrypoint: ["/init.sh"]
-    env_file: .env
-    networks:
-      - oravox_player_network
-    volumes:
-      - ${SRC_DB_DIR}:/db
-      - ${SRC_STORIES_DIR}:/stories
-      - web_db:/var/www/html/db
-      - web_stories:/var/www/html/assets/stories
-      - ./docker/copier/init.sh:/init.sh:ro
-
   phpfpm:
     image: docker.io/bitnami/php-fpm:latest
     env_file: .env
     restart: always
     depends_on:
-      cloner:
+      builder:
         condition: service_completed_successfully
       copier:
         condition: service_completed_successfully
@@ -41,40 +21,26 @@ services:
       PHP_POST_MAX_SIZE: $PHP_POST_MAX_SIZE
       PHP_UPLOAD_MAX_FILESIZE: $PHP_UPLOAD_MAX_FILESIZE
       PHP_MAX_EXECUTION_TIME: $PHP_MAX_EXECUTION_TIME
-      PLAYER_BASE_LOCATION: $PLAYER_BASE_LOCATION
-      OPENAI_API_KEY: $OPENAI_API_KEY
     networks:
       - oravox_player_network
     volumes:
       - web:/var/www/html
       - web_db:/var/www/html/db
       - web_stories:/var/www/html/assets/stories
+      - ./.env-app:/var/www/html/.env:ro
 
   webserver:
     image: docker.io/nginx:alpine
     restart: always
-    command: sh -c "sed 's|__base__|$PLAYER_BASE_LOCATION|;s|__openai__|$OPENAI_API_KEY|' /tmp/default.conf > /etc/nginx/nginx.conf && exec nginx -g 'daemon off;'"
     ports:
       - "38080:80"
     depends_on:
-      - phpfpm
-      - cloner
-    env_file: .env
-    environment:
-      OPENAI_API_KEY: $OPENAI_API_KEY
-      PLAYER_BASE_LOCATION: $PLAYER_BASE_LOCATION
+      phpfpm:
+        condition: service_started
     networks:
       - oravox_player_network
     volumes:
       - web:/var/www/html
       - web_db:/var/www/html/db
       - web_stories:/var/www/html/assets/stories
-      - ./nginx/nginx.conf:/tmp/default.conf:ro
-volumes:
-  web:
-  web_stories:
-  web_db:
-
-networks:
-  oravox_player_network:
-    driver: bridge
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro

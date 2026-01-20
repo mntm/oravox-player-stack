@@ -1,0 +1,16 @@
+# This services is responsible for copying other files
+# needed for the project
+
+services:
+  copier:
+    image: docker.io/alpine:latest
+    entrypoint: ["/init.sh"]
+    env_file: .env
+    networks:
+      - oravox_player_network
+    volumes:
+      - ${SRC_DB_DIR}:/db
+      - ${SRC_STORIES_DIR}:/stories
+      - web_db:/var/www/html/db
+      - web_stories:/var/www/html/assets/stories
+      - ./docker/copier/init.sh:/init.sh:ro
