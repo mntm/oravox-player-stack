@@ -14,7 +14,9 @@ BRANCH=${GIT_BRANCH:-"main"}
 echo "Attempte to create $DEST_DIR"
 [ ! -d "$DEST_DIR" ] && mkdir -p "$DEST_DIR"
 
-cd $DEST_DIR
+cd "$DEST_DIR"
+
+git config --global --add safe.directory "$DEST_DIR"
 
 if [ -d ".git" ]; then
   echo "Repository initialized: pulling"
