@@ -2,3 +2,4 @@ volumes:
   web:
   web_stories:
   web_db:
+  mariadb_data:
