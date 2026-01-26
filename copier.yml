@@ -9,8 +9,6 @@ services:
     networks:
       - oravox_player_network
     volumes:
-      - ${SRC_DB_DIR}:/db
       - ${SRC_STORIES_DIR}:/stories
-      - web_db:/var/www/html/db
       - web_stories:/var/www/html/assets/stories
       - ./docker/copier/init.sh:/init.sh:ro

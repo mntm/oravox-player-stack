@@ -51,7 +51,6 @@ services:
       - oravox_player_network
     volumes:
       - web:/var/www/html
-      - web_db:/var/www/html/db
       - web_stories:/var/www/html/assets/stories
       - ./php/session.ini:/opt/bitnami/php/etc/conf.d/90-session.ini:ro
       - ./.env-app:/var/www/html/.env:ro
@@ -70,6 +69,5 @@ services:
       - oravox_player_network
     volumes:
       - web:/var/www/html
-      - web_db:/var/www/html/db
       - web_stories:/var/www/html/assets/stories
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
