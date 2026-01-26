@@ -17,6 +17,22 @@ services:
     volumes:
       - web:/var/www/html
       - composer_cache:/tmp
+  migration:
+    image: docker.io/bitnami/php-fpm:latest
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      builder:
+        condition: service_completed_successfully
+    entrypoint: ["/init.sh"]
+    networks:
+      - oravox_player_network
+    volumes:
+      - web:/var/www/html
+      - ./.env-app:/var/www/html/.env:ro
+      - ./docker/builder/migration/migration.sh:/init.sh:ro
+    env_file: .env
+    working_dir: $WWW_DIR
 
 volumes:
   composer_cache:
