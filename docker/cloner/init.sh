@@ -35,5 +35,6 @@ else
   echo "Switching to branch: $BRANCH"
   git checkout -B $BRANCH origin/$BRANCH
   echo "Syncing branch"
-  git pull
+  git fetch origin
+  git reset --hard origin/$(git rev-parse --abbrev-ref HEAD)
 fi
