@@ -25,7 +25,8 @@ if [ -d ".git" ]; then
   echo "Track remote branch for: $BRANCH"
   git checkout -B $BRANCH origin/$BRANCH
   echo "Syncing branch"
-  git pull
+  git fetch origin
+  git reset --hard origin/$(git rev-parse --abbrev-ref HEAD)
 else
   echo "Repository missing: cloning"
   echo "Cleaning the directory first"
@@ -35,6 +36,5 @@ else
   echo "Switching to branch: $BRANCH"
   git checkout -B $BRANCH origin/$BRANCH
   echo "Syncing branch"
-  git fetch origin
-  git reset --hard origin/$(git rev-parse --abbrev-ref HEAD)
+  git pull
 fi
