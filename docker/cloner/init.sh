@@ -2,6 +2,7 @@
 
 set -e
 set -u
+# shellcheck disable=SC3040
 set -o pipefail
 
 ## check if REPO_URL is populated
@@ -21,20 +22,20 @@ git config --global --add safe.directory "$DEST_DIR"
 if [ -d ".git" ]; then
   echo "Repository initialized: pulling"
   echo "Attempt to set origin"
-  git remote set-url origin $REPO_URL
+  git remote set-url origin "$REPO_URL"
   echo "Track remote branch for: $BRANCH"
-  git checkout -B $BRANCH origin/$BRANCH
+  git checkout -B "$BRANCH" "origin/$BRANCH"
   echo "Syncing branch"
-  git fetch origin
-  git reset --hard origin/$(git rev-parse --abbrev-ref HEAD)
+  git pull
+  git reset --hard "origin/$(git rev-parse --abbrev-ref HEAD)"
 else
   echo "Repository missing: cloning"
   echo "Cleaning the directory first"
   rm -rf .[!.]* /..?*
   echo "Cloning the repository"
-  git clone $REPO_URL .
+  git clone "$REPO_URL" .
   echo "Switching to branch: $BRANCH"
-  git checkout -B $BRANCH origin/$BRANCH
+  git checkout -B "$BRANCH" "origin/$BRANCH"
   echo "Syncing branch"
   git pull
 fi
