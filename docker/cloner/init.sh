@@ -39,3 +39,12 @@ else
   echo "Syncing branch"
   git pull
 fi
+
+last_tag=""
+if git describe --tags "$(git rev-list --tags --max-count=1)"; then 
+  last_tag=$(git describe --tags "$(git rev-list --tags --max-count=1)")
+  last_tag="$last_tag+"
+fi
+
+last_hash=$(git rev-parse --short HEAD)
+echo "$last_tag$last_hash" > release-tag
