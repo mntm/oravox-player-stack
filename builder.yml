@@ -33,6 +33,21 @@ services:
       - ./docker/builder/migration/migration.sh:/init.sh:ro
     env_file: .env
     working_dir: $WWW_DIR
+  build_style:
+    image: docker.io/node:lts-alpine3.23
+    command: /bin/sh -c "cd scripts/twcss && npm cache verify && npm ci && npm run build:css"
+    environment:
+      - npm_config_cache=/npm-cache
+    networks:
+      - oravox_player_network
+    depends_on:
+      cloner:
+        condition: service_completed_successfully
+    working_dir: /var/www/html/
+    volumes:
+      - web:/var/www/html
+      - npm_cache:/npm-cache
 
 volumes:
   composer_cache:
+  npm_cache:
