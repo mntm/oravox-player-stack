@@ -23,9 +23,11 @@ if [ -d ".git" ]; then
   echo "Repository initialized: pulling"
   echo "Attempt to set origin"
   git remote set-url origin "$REPO_URL"
+  echo "Syncing branch"
+  git fetch
   echo "Track remote branch for: $BRANCH"
   git checkout -B "$BRANCH" "origin/$BRANCH"
-  echo "Syncing branch"
+  echo "Merging last modification from remote"
   git pull
   git reset --hard "origin/$(git rev-parse --abbrev-ref HEAD)"
 else
