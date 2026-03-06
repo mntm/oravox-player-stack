@@ -1,10 +1,15 @@
 # This services is responsible for copying other files
 # needed for the project
+include:
+  - ./cloner.yml
 
 services:
   copier:
     image: docker.io/alpine:latest
     entrypoint: ["/init.sh"]
+    depends_on:
+      cloner:
+        condition: service_completed_successfully
     env_file: .env
     networks:
       - oravox_player_network
